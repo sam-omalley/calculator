@@ -1,0 +1,105 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --number-bg: rgb(51, 51, 51);
+  --number-down-bg: rgb(115, 115, 115);
+
+  --operator-bg: rgb(241, 163, 59);
+  --operator-down-bg: rgb(243, 200, 149);
+
+  --mono-bg: rgb(165, 165, 165);
+  --mono-down-bg: rgb(217, 217, 217);
+
+  --calculator-bg: rgb(0, 0, 0);
+  --backdrop-bg: rgb(0, 0, 0, 80%);
+
+  --button-size: 70px;
+  --button-spacing: 20px;
+  --calculator-padding: 20px;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'Inter', Helvetica, sans-serif;
+  font-weight: 200;
+  background-color: var(--backdrop-bg);
+}
+
+.calculator {
+  display: flex;
+  gap: var(--button-spacing);
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  background-color: var(--calculator-bg);
+  padding: var(--calculator-padding);
+  overflow: none;
+  border-radius: 20px;
+  filter: drop-shadow(5px 5px 10px #000);
+}
+
+.screen {
+  background-color: var(--calculator-bg);
+  padding-top: 100px;
+  color: white;
+  text-align: right;
+  font-size: 5em;
+}
+
+.numpad {
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+button {
+  border-radius: 100000px;
+  width: var(--button-size);
+  height: var(--button-size);
+  border: none;
+  font-size: 32px;
+  font-weight: 200;
+}
+button:hover {
+  cursor: pointer;
+}
+
+button.mono {
+  background-color: var(--mono-bg);
+}
+button.mono:hover {
+  background-color: var(--mono-down-bg);
+}
+
+button.operator {
+  background-color: var(--operator-bg);
+  color: white;
+}
+button.operator:hover {
+  background-color: var(--operator-down-bg);
+}
+
+button.number {
+  background-color: var(--number-bg);
+  color: white;
+}
+button.number:hover {
+  background-color: var(--number-down-bg);
+}
+
+button.zero {
+  grid-column: span 2;
+  width: 100%;
+  text-align: left;
+  padding-left: calc((var(--button-size) / 2) - var(--button-spacing) + 0.5rem);
+}

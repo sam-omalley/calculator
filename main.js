@@ -1,9 +1,12 @@
 const screen = document.querySelector('.screen__input');
 const numpad = document.querySelector(".numpad");
 const buttons = numpad.querySelectorAll("button");
+const ac_btn = numpad.querySelector("button[data-action=clear");
 
 class Calculator {
-  constructor(screen, buttons) {
+  constructor(screen, buttons, ac_btn) {
+    this.ac_btn = ac_btn;
+    this.updateAcBtn("AC");
     this.operation = null;
     this.previous = null;
     this.current = null;
@@ -12,6 +15,7 @@ class Calculator {
     this.total = 0;
     this.screen = screen;
     this.renderNum(0);
+
 
     /* Set up click handlers. */
     buttons.forEach(button => button.addEventListener('click', e => {
@@ -51,6 +55,7 @@ class Calculator {
   }
 
   actionPress(action) {
+    this.updateAcBtn("C");
     switch (action) {
       /* Binary operators */
       case '+':
@@ -71,6 +76,7 @@ class Calculator {
         break;
       /* Singular operators. */
       case 'clear':
+        this.updateAcBtn("AC");
         this.current = null;
         this.previous = null;
         this.operation = null;
@@ -118,7 +124,7 @@ class Calculator {
   }
 
   numberPress(digit) {
-    console.log(`numberPress(${digit})`)
+    this.updateAcBtn("C");
     if (!this.fractional) {
       if (this.current === null) {
         this.current = 0;
@@ -140,6 +146,10 @@ class Calculator {
     this.renderNum(this.current);
   }
 
+  updateAcBtn(text) {
+      this.ac_btn.innerText = text;
+  }
+
   renderNum(num) {
     let output_str = num.toLocaleString(
       undefined,
@@ -157,7 +167,7 @@ class Calculator {
   }
 }
 
-const calculator = new Calculator(screen, buttons);
+const calculator = new Calculator(screen, buttons, ac_btn);
 
 document.addEventListener('keypress', e => {
   let name = e.key;

@@ -37,20 +37,13 @@ class Calculator {
   }
 
   calculate() {
-    console.log(`calculate()
-        Previous: ${this.previous}
-        Current: ${this.current}
-        Operation: ${this.operation}`
-    );
     if (this.operation) {
       const result = this.operation(this.previous, this.current);
       this.previous = result;
       this.operation = null;
-      console.log("renderNum(result)");
       this.renderNum(result);
     } else if (this.current !== null) {
       this.previous = this.current;
-      console.log("renderNum(this.current)");
       this.renderNum(this.current);
     }
     this.current = null;
@@ -58,7 +51,6 @@ class Calculator {
   }
 
   actionPress(action) {
-    console.log(`Action: ${action}`);
     switch (action) {
       /* Binary operators */
       case '+':
@@ -83,9 +75,7 @@ class Calculator {
         this.previous = null;
         this.operation = null;
         this.fractional = false;
-        console.log("renderNum(0)");
         this.renderNum(0);
-        console.clear();
         break;
       case '=':
         this.calculate();
@@ -95,7 +85,6 @@ class Calculator {
           this.current = 0;
         }
         this.current *= -1;
-        console.log("renderNum(this.current)");
         this.renderNum(this.current);
         break;
       case '%':
@@ -129,8 +118,8 @@ class Calculator {
   }
 
   numberPress(digit) {
+    console.log(`numberPress(${digit})`)
     if (!this.fractional) {
-      console.log(`Pressed: ${digit}`)
       if (this.current === null) {
         this.current = 0;
       }
@@ -148,17 +137,10 @@ class Calculator {
       s += digit.toString();
       this.current = parseFloat(s);
     }
-    console.log("renderNum(this.current)");
     this.renderNum(this.current);
   }
 
   renderNum(num) {
-    console.log(`renderNum(${num})
-        Previous: ${this.previous}
-        Current: ${this.current}
-        Operation: ${this.operation}`
-    );
-    console.log(`Current: ${this.current}`);
     let output_str = num.toLocaleString(
       undefined,
       {
@@ -176,3 +158,51 @@ class Calculator {
 }
 
 const calculator = new Calculator(screen, buttons);
+
+document.addEventListener('keypress', e => {
+  let name = e.key;
+  let code = e.code;
+
+  switch (name) {
+    case "*":
+    case "/":
+    case "-":
+    case "+":
+    case ".":
+    case "=":
+      calculator.actionPress(name);
+      e.preventDefault();
+      break;
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      calculator.numberPress(parseInt(name));
+      e.preventDefault();
+      break;
+    case "Enter":
+      calculator.actionPress("=");
+      e.preventDefault();
+      break;
+  }
+}, false);
+
+document.addEventListener('keyup', e => {
+  let name = e.key;
+  let code = e.code;
+
+  switch (name) {
+    case "Escape":
+    case "Backspace":
+    case "Delete":
+      calculator.actionPress("clear");
+      e.preventDefault();
+      break;
+  }
+}, false);

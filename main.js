@@ -5,11 +5,13 @@ const buttons = numpad.querySelectorAll("button");
 class Calculator {
   constructor(screen, buttons) {
     this.operation = null;
-    this.previous = 0;
+    this.previous = null;
+    this.current = null;
+    this.fractional = false;
 
     this.total = 0;
     this.screen = screen;
-    this.updateScreen();
+    this.renderNum(0);
 
     /* Set up click handlers. */
     buttons.forEach(button => button.addEventListener('click', e => {
@@ -34,62 +36,130 @@ class Calculator {
     return a / b;
   }
 
+  calculate() {
+    console.log(`calculate()
+        Previous: ${this.previous}
+        Current: ${this.current}
+        Operation: ${this.operation}`
+    );
+    if (this.operation) {
+      const result = this.operation(this.previous, this.current);
+      this.previous = result;
+      this.operation = null;
+      console.log("renderNum(result)");
+      this.renderNum(result);
+    } else if (this.current !== null) {
+      this.previous = this.current;
+      console.log("renderNum(this.current)");
+      this.renderNum(this.current);
+    }
+    this.current = null;
+    this.fractional = false;
+  }
+
   actionPress(action) {
+    console.log(`Action: ${action}`);
     switch (action) {
       /* Binary operators */
       case '+':
+        this.calculate();
         this.operation = this.sum;
-        this.previous = this.total;
-        this.total = 0;
         break;
       case '*':
+        this.calculate();
         this.operation = this.mul;
-        this.previous = this.total;
-        this.total = 0;
         break;
       case '-':
+        this.calculate();
         this.operation = this.sub;
-        this.previous = this.total;
-        this.total = 0;
         break;
       case '/':
+        this.calculate();
         this.operation = this.div;
-        this.previous = this.total;
-        this.total = 0;
         break;
       /* Singular operators. */
       case 'clear':
-        this.total = 0;
-        this.updateScreen();
+        this.current = null;
+        this.previous = null;
+        this.operation = null;
+        this.fractional = false;
+        console.log("renderNum(0)");
+        this.renderNum(0);
+        console.clear();
         break;
       case '=':
-        console.log(`Prev: ${this.previous} Tot: ${this.total} Op: ${this.operation.toString()}`);
-        this.total = this.operation(this.previous, this.total);
-        this.previous = this.total;
-        this.updateScreen();
+        this.calculate();
         break;
       case '+/-':
-        this.total *= -1;
-        this.updateScreen();
+        if (this.current === null) {
+          this.current = 0;
+        }
+        this.current *= -1;
+        console.log("renderNum(this.current)");
+        this.renderNum(this.current);
         break;
       case '%':
-        this.total /= 100.0;
-        this.updateScreen();
+        if (!this.current && this.previous) {
+          this.current = this.previous;
+        }
+        if (this.current) {
+          this.current /= 100.0;
+          this.renderNum(this.current);
+        }
+        break;
+      case '.':
+        if (!this.fractional) {
+          this.fractional = true;
+          /* TODO: Get appropriate symbol from locale */
+          if (!this.current) {
+            this.renderNum(0);
+          }
+          this.screen.innerText += "."
+        }
         break;
       default:
-        console.log(action);
+        console.log(`Warning: Unsupported action "${action}"`);
     }
   }
 
-  numberPress(digit) {
-    this.total *= 10;
-    this.total += digit;
-
-    this.updateScreen();
+  isZeroNegative(zero) {
+    const isZero = zero === 0;
+    const isNegative = 1 / zero === -Infinity;
+    return isNegative && isZero;
   }
 
-  updateScreen() {
-    let result = this.total.toLocaleString(
+  numberPress(digit) {
+    if (!this.fractional) {
+      console.log(`Pressed: ${digit}`)
+      if (this.current === null) {
+        this.current = 0;
+      }
+      if (this.current < 0 || this.isZeroNegative(this.current)) {
+        digit = -digit;
+      }
+      this.current *= 10;
+      this.current += digit;
+    }
+    else {
+      let s = (this.current ?? 0).toString();
+      if (!s.match(/\./)) {
+        s += ".";
+      }
+      s += digit.toString();
+      this.current = parseFloat(s);
+    }
+    console.log("renderNum(this.current)");
+    this.renderNum(this.current);
+  }
+
+  renderNum(num) {
+    console.log(`renderNum(${num})
+        Previous: ${this.previous}
+        Current: ${this.current}
+        Operation: ${this.operation}`
+    );
+    console.log(`Current: ${this.current}`);
+    let output_str = num.toLocaleString(
       undefined,
       {
         minimumFractionDigits: 0,
@@ -97,11 +167,11 @@ class Calculator {
       }
     );
 
-    if (result.length > 8 || (this.total !== 0 && this.total < 0.00001 && result === "0")) {
-      result = this.total.toExponential(2);
+    if (output_str.length > 8 || (num !== 0 && num < 0.00001 && output_str === "0")) {
+      output_str = num.toExponential(2);
     }
 
-    this.screen.innerText = result;
+    this.screen.innerText = output_str;
   }
 }
 

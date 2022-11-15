@@ -4,7 +4,7 @@ Clone of the iOS Calculator app. This is an exercise in raw CSS and Javascript.
 
 ## Demo
 
-[Link to Example](https://omalsa04.github.io/calculator/)
+[Link to Example](https://sam-omalley.github.io/calculator/)
 
 ## To run locally
 
